@@ -10,8 +10,8 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       id-token: write
-      content: read
-    
+      contents: read
+
     steps:
       - name: checkout
         uses: actions/checkout@5   
