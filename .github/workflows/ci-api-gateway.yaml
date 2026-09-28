@@ -1,8 +1,8 @@
 name: ci-api-gateway
 
 on:
-  push:
-    branches: [develop, 'release/**']
+#  push:
+#    branches: [develop, 'release/**']
   
   workflow_dispatch:
 
