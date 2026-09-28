@@ -1,0 +1,14 @@
+name: ci-api-gateway
+
+on: 
+  workflow_dispatch:
+
+jobs:
+  runs-on: ubuntu-latest
+  permissions:
+    id-token: write
+    content: read
+  
+  steps:
+    - name: checkout
+      uses: actions/checkout@5   
