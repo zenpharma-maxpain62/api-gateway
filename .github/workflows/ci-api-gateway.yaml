@@ -13,5 +13,16 @@ jobs:
       contents: read
 
     steps:
+
       - name: checkout
         uses: actions/checkout@v4
+
+      - name: setup java
+        used: actions/setup-java@v6
+        with:
+          destribution: temurin
+          java-version: 17
+          cache: maven
+        
+      - name: build
+        run: mvn verify --no-transfer-progress
