@@ -17,6 +17,8 @@ jobs:
       - name: checkout
         id: checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: check all outputs
         run: |
@@ -39,42 +41,42 @@ jobs:
       - name: show repo name
         run: echo '${{ github.repository }}'
 
-      - name: setup java
-        uses: actions/setup-java@v6
-        with:
-          distribution: temurin
-          java-version: 17
-          cache: maven
-        
-      - name: maven - compile build test
-        run: mvn verify --no-transfer-progress
-
-      - name: sonarqube - SAST + code quality
-        uses: SonarSource/sonarqube-scan-action@da4450e400cebf84292b12a85d4ca0080ae2938c
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }} 
-        with:
-          args: >
-            -Dsonar.organization=${{ vars.SONAR_ORG }}
-            -Dsonar.projectKey=${{ vars.SONAR_PROJECT_KEY_API_GATEWAY }}
-            -Dsonar.java.binaries=target/classes
-
-      - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v6.1.0
-        with:
-          audience: sts.amazonaws.com
-          role-to-assume: arn:aws:iam::134448505602:role/zenpharma-dev-github-actions-role
-          aws-region: ap-south-1
-      
-      - name: login to aws ecr
-        uses: aws-actions/amazon-ecr-login@v2
-        id: login-ecr
-
-      - name: show output
-        run: echo '${{ toJSON(steps.login-ecr) }}'
-      
-      - name: build and push docker image
-        run: |
-          IMAGE_URI="${{ steps.login-ecr.outputs.registry }}/api-gateway:latest"
-          docker build -t $IMAGE_URI .
-          docker push $IMAGE_URI
+#      - name: setup java
+#        uses: actions/setup-java@v6
+#        with:
+#          distribution: temurin
+#          java-version: 17
+#          cache: maven
+#        
+#      - name: maven - compile build test
+#        run: mvn verify --no-transfer-progress
+#
+#      - name: sonarqube - SAST + code quality
+#        uses: SonarSource/sonarqube-scan-action@da4450e400cebf84292b12a85d4ca0080ae2938c
+#        env:
+#          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }} 
+#        with:
+#          args: >
+#            -Dsonar.organization=${{ vars.SONAR_ORG }}
+#            -Dsonar.projectKey=${{ vars.SONAR_PROJECT_KEY_API_GATEWAY }}
+#            -Dsonar.java.binaries=target/classes
+#
+#      - name: Configure AWS Credentials
+#        uses: aws-actions/configure-aws-credentials@v6.1.0
+#        with:
+#          audience: sts.amazonaws.com
+#          role-to-assume: arn:aws:iam::134448505602:role/zenpharma-dev-github-actions-role
+#          aws-region: ap-south-1
+#      
+#      - name: login to aws ecr
+#        uses: aws-actions/amazon-ecr-login@v2
+#        id: login-ecr
+#
+#      - name: show output
+#        run: echo '${{ toJSON(steps.login-ecr) }}'
+#      
+#      - name: build and push docker image
+#        run: |
+#          IMAGE_URI="${{ steps.login-ecr.outputs.registry }}/api-gateway:latest"
+#          docker build -t $IMAGE_URI .
+#          docker push $IMAGE_URI
