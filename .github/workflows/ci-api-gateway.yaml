@@ -49,5 +49,5 @@ jobs:
         id: login-ecr
 
       - name: show output
-        run: echo "${{ steps.login-ecr.output.* }}"
+        run: echo "${{ steps.login-ecr.outputs.* }}"
 
