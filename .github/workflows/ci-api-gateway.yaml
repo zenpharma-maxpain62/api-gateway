@@ -30,6 +30,9 @@ jobs:
       - name: show latest tag output
         run: echo '${{ steps.show-latest-tag.outputs.GIT_TAG }}'
 
+      - name: show repo name
+        run: echo '${{ github.repository }}'
+
       - name: setup java
         uses: actions/setup-java@v6
         with:
