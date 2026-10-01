@@ -17,10 +17,13 @@ jobs:
       - name: checkout
         id: checkout
         uses: actions/checkout@v4
+
+      - name: show latest tag
+        id: show-latest-tag
         run: git describe --tags --abbrev=0
 
       - name: show checkout output
-        run: echo '${{ toJSON(steps.checkout) }}'
+        run: echo '${{ toJSON(steps.checkout) }}' && echo '${{ toJSON(steps.show-latest-tag) }}'
 
       - name: setup java
         uses: actions/setup-java@v6
