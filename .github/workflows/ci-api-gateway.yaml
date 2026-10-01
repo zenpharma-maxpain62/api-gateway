@@ -22,6 +22,7 @@ jobs:
         run: |
           ls -la
           pwd
+          git tag -l
 
       - name: show latest tag
         id: show-latest-tag
