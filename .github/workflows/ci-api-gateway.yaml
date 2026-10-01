@@ -20,13 +20,15 @@ jobs:
 
       - name: show latest tag
         id: show-latest-tag
-        run: export GIT_TAG=$(git tag --sort=-creatordate | head -n 1) && echo $GIT_TAG
+        run: |
+          GIT_TAG=$(git tag --sort=-creatordate | head -n 1) 
+          echo "GIT_TAG=$GIT_TAG" >> "$GITHUB_ENV"
 
       - name: show checkout output
         run: echo '${{ toJSON(steps.checkout) }}'
 
       - name: show latest tag output
-        run: echo $GIT_TAG
+        run: echo '${{ steps.show-latest-tag.outputs.GIT_TAG }}'
 
       - name: setup java
         uses: actions/setup-java@v6
