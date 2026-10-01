@@ -20,7 +20,7 @@ jobs:
 
       - name: show latest tag
         id: show-latest-tag
-        run: git describe --tags --abbrev=0
+        run: git tag --sort=-creatordate
 
       - name: show checkout output
         run: echo '${{ toJSON(steps.checkout) }}'
