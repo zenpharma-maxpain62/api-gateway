@@ -17,6 +17,7 @@ jobs:
       - name: checkout
         id: checkout
         uses: actions/checkout@v4
+        run: git describe --tags --abbrev=0
 
       - name: show checkout output
         run: echo '${{ toJSON(steps.checkout) }}'
