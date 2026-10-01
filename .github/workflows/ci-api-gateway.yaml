@@ -23,7 +23,10 @@ jobs:
         run: git describe --tags --abbrev=0
 
       - name: show checkout output
-        run: echo '${{ toJSON(steps.checkout) }}' && echo '${{ toJSON(steps.show-latest-tag) }}'
+        run: echo '${{ toJSON(steps.checkout) }}'
+
+      - name: show latest tag output
+        run: echo '${{ toJSON(steps.show-latest-tag) }}'
 
       - name: setup java
         uses: actions/setup-java@v6
