@@ -12,7 +12,7 @@ jobs:
       id-token: write
       contents: read
     outputs:
-      GIT_LATEST_TAG_OUTPUT: ${{ steps.image-tag.outputs.GIT_LATEST_TAG}}
+      GIT_LATEST_TAG_OUTPUT: ${{ steps.tag.outputs.image_tag}}
     steps:
 
       - name: checkout
@@ -21,19 +21,18 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: image tag
+        id: tag
+        run: echo "image_tag=$(git describe --tags --abbrev=0)" >> $GITHUB_OUTPUT
+
+      - name: show value of tag
+        run: echo '${{ steps.image-tag.outputs.GIT_LATEST_TAG_OUTPUT }}'
+
 #      - name: check all outputs
 #        run: |
 #          GIT_LATEST_TAG=$(git describe --tags --abbrev=0)
 #          echo "GIT_LATEST_TAG=$GIT_LATEST_TAG" >> "$GITHUB_ENV"
 
-      - name: image tag
-        id: image-tag
-        run: |
-          GIT_LATEST_TAG=$(git describe --tags --abbrev=0)
-          echo "GIT_LATEST_TAG=$GIT_LATEST_TAG" >> "$GITHUB_OUTPUTS"
-
-      - name: show value of GIT_LATEST_TAG
-        run: echo '${{ steps.image-tag.outputs.GIT_LATEST_TAG_OUTPUT }}'
 
 #      - name: show latest tag
 #        id: show-latest-tag
