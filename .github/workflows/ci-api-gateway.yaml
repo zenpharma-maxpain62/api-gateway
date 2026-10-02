@@ -57,11 +57,21 @@ jobs:
         id: login-ecr
 
       - name: build and push docker image
+        id: image-build-push
         run: |
           IMAGE="${{ steps.login-ecr.outputs.registry }}/api-gateway:${{ steps.fetch-tag.outputs.tag }}"
           docker build -t $IMAGE .
           docker push $IMAGE
-
+      
+      - name: trivy image scan
+        uses: aquasecurity/trivy-action@v0.36.0
+        with:
+          image-ref: ${{ steps.image-build-push.outputs.image}}
+          format: sarif
+          output: trivy-results.sarif
+          severity: HIGH,CRITICAL
+          exit-code: '0'
+          ignore-unfixed: true
 
 #      - name: check all outputs
 #        run: |
