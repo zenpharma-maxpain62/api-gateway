@@ -11,8 +11,6 @@ jobs:
     permissions:
       id-token: write
       contents: read
-    outputs:
-      GIT_LATEST_TAG_OUTPUT: ${{ steps.tag.outputs.image_tag}}
     steps:
 
       - name: checkout
@@ -21,12 +19,12 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: image tag
-        id: tag
-        run: echo "image_tag=$(git describe --tags --abbrev=0)" >> $GITHUB_OUTPUT
+      - name: fetch tag
+        id: fetch-tag
+        run: echo "tag=${git describe --tags --abbrev=0}" >> "$GITHUB_OUTPUT"
 
-      - name: show value of tag
-        run: echo '${{ steps.image-tag.outputs.GIT_LATEST_TAG_OUTPUT }}'
+      - name: show tag
+        run: echo '${{ steps.fetch-tag.outputs.tag }}'
 
 #      - name: check all outputs
 #        run: |
