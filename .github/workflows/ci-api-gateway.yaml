@@ -74,7 +74,7 @@ jobs:
           ignore-unfixed: true
 
       - name: push image
-        id push-image
+        id: push-image
         run: |
           IMAGE="${{ steps.image-build-push.outputs.image}}"
           docker push $IMAGE
