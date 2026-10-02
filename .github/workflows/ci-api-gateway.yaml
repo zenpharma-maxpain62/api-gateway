@@ -11,7 +11,8 @@ jobs:
     permissions:
       id-token: write
       contents: read
-
+    outputs:
+      GIT_LATEST_TAG_OUTPUT: ${{ steps.image-tag.outputs.GIT_LATEST_TAG}}
     steps:
 
       - name: checkout
@@ -20,27 +21,34 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: check all outputs
+#      - name: check all outputs
+#        run: |
+#          GIT_LATEST_TAG=$(git describe --tags --abbrev=0)
+#          echo "GIT_LATEST_TAG=$GIT_LATEST_TAG" >> "$GITHUB_ENV"
+
+      - name: image tag
+        id: image-tag
         run: |
-          ls -la
-          pwd
-          git tag -l
-          git describe --tags --abbrev=0
+          GIT_LATEST_TAG=$(git describe --tags --abbrev=0)
+          echo "GIT_LATEST_TAG=$GIT_LATEST_TAG" >> "$GITHUB_OUTPUTS"
 
-      - name: show latest tag
-        id: show-latest-tag
-        run: |
-          GIT_TAG=$(git tag --sort=-creatordate | head -n 1) 
-          echo "GIT_TAG=$GIT_TAG" >> "$GITHUB_ENV"
+      - name: show value of GIT_LATEST_TAG
+        run: echo '${{ steps.image-tag.outputs.GIT_LATEST_TAG_OUTPUT }}'
 
-      - name: show checkout output
-        run: echo '${{ toJSON(steps.checkout) }}'
-
-      - name: show latest tag output
-        run: echo '${{ steps.show-latest-tag.outputs.GIT_TAG }}'
-
-      - name: show repo name
-        run: echo '${{ github.repository }}'
+#      - name: show latest tag
+#        id: show-latest-tag
+#        run: |
+#          GIT_TAG=$(git tag --sort=-creatordate | head -n 1) 
+#          echo "GIT_TAG=$GIT_TAG" >> "$GITHUB_ENV"
+#
+#      - name: show checkout output
+#        run: echo '${{ toJSON(steps.checkout) }}'
+#
+#      - name: show latest tag output
+#        run: echo '${{ steps.show-latest-tag.outputs.GIT_TAG }}'
+#
+#      - name: show repo name
+#        run: echo '${{ github.repository }}'
 
 #      - name: setup java
 #        uses: actions/setup-java@v6
