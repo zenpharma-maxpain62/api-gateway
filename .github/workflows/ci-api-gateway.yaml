@@ -25,6 +25,7 @@ jobs:
           ls -la
           pwd
           git tag -l
+          git describe --tags --abbrev=0
 
       - name: show latest tag
         id: show-latest-tag
