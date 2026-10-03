@@ -98,20 +98,24 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+
       - name: checkout gitops
         uses: actions/checkout@v4
         with:
           repository: ${{ vars.GITOPS_REPO }}
           token: ${{ secrets.GITHUB_TOKEN }}
           path: _gitops
+
       - name: fetch tag
         id: fetch-tag
         run: echo "tag=$(git describe --tags --abbrev=0)" >> "$GITHUB_OUTPUT"
+
       - name: show tag
         run: echo '${{ steps.fetch-tag.outputs.tag }}'
+
       - name: update tag in gitops
         run: |
-          export IMAGE_TAG=$(grep "tag:" envs/dev/values-api-gateway.yaml | awk '{print $2}')
+          export IMAGE_TAG=$(grep "tag:" _gitops/envs/dev/values-api-gateway.yaml | awk '{print $2}')
           echo "current image tag: $IMAGE_TAG"
           echo "Replacing image tag with: ${{ steps.fetch-tag.outputs.tag }}"
           sed -i "s/tag: $IMAGE_TAG/tag: ${{ steps.fetch-tag.outputs.tag }}" _gitops/envs/dev/values-api-gateway.yaml
