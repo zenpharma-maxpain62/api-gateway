@@ -85,32 +85,43 @@ jobs:
         run: |
           IMAGE="${{ steps.image-build-push.outputs.image}}"
           docker push $IMAGE
+      
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
 
+      steps:
+        - name: checkout
+          uses: actions/checkout@v4
+          with:
+            fetch-depth: 0
 
-#      - name: check all outputs
-#        run: |
-#          GIT_LATEST_TAG=$(git describe --tags --abbrev=0)
-#          echo "GIT_LATEST_TAG=$GIT_LATEST_TAG" >> "$GITHUB_ENV"
+        - name: checkout gitops
+          uses: actions/checkout@v4
+          with:
+            repository: ${{ vars.GITOPS_REPO }}
+            token: ${{ secrets.GITHUB_TOKEN }}
+            path: _gitops
 
+        - name: fetch tag
+          id: fetch-tag
+          run: echo "tag=$(git describe --tags --abbrev=0)" >> "$GITHUB_OUTPUT"
 
-#      - name: show latest tag
-#        id: show-latest-tag
-#        run: |
-#          GIT_TAG=$(git tag --sort=-creatordate | head -n 1) 
-#          echo "GIT_TAG=$GIT_TAG" >> "$GITHUB_ENV"
-#
-#      - name: show checkout output
-#        run: echo '${{ toJSON(steps.checkout) }}'
-#
-#      - name: show latest tag output
-#        run: echo '${{ steps.show-latest-tag.outputs.GIT_TAG }}'
-#
-#      - name: show repo name
-#        run: echo '${{ github.repository }}'
+        - name: show tag
+          run: echo '${{ steps.fetch-tag.outputs.tag }}'
 
-#        
-#
-#
-#      - name: show output
-#        run: echo '${{ toJSON(steps.login-ecr) }}'
-#      
+        - name: update tag in gitops
+          run: |
+            export IMAGE_TAG=$(grep "tag:" envs/dev/values-api-gateway.yaml | awk '{print $2}')
+            echo "current image tag: $IMAGE_TAG"
+            echo "Replacing image tag with: ${{ steps.fetch-tag.outputs.tag }}"
+            sed -i "s/tag: $IMAGE_TAG/tag: ${{ steps.fetch-tag.outputs.tag }}" _gitops/envs/dev/values-api-gateway.yaml
+            cd _gitops
+            git config user.name "maxpain62"
+            git add .
+            git commit -m "Updated api-gateway image tag to ${{ steps.fetch-tag.outputs.tag }}"
+            git pull origin main --rebase 
+            git push origin main
