@@ -113,16 +113,34 @@ jobs:
       - name: show tag
         run: echo '${{ steps.fetch-tag.outputs.tag }}'
 
+      - name: Check GitHub token permissions
+        run: |
+          echo "Repository: $GITHUB_REPOSITORY"
+          echo "Actor: $GITHUB_ACTOR"
+          echo "Token permissions:"
+          gh api \
+            -H "Authorization: Bearer $GITHUB_TOKEN" \
+            /repos/${{ vars.GITOPS_REPO }} \
+            --jq '.permissions'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
       - name: update tag in gitops
         run: |
-          export IMAGE_TAG=$(grep "tag:" _gitops/envs/dev/values-api-gateway.yaml | awk '{print $2}')
-          echo "current image tag: $IMAGE_TAG"
-          echo "Replacing image tag with: ${{ steps.fetch-tag.outputs.tag }}"
-          sed -i "s/tag: $IMAGE_TAG/tag: ${{ steps.fetch-tag.outputs.tag }}/g" _gitops/envs/dev/values-api-gateway.yaml
+          TAG="${{ steps.fetch-tag.outputs.tag }}"
+
           cd _gitops
+
+          git remote -v
+          git config --get remote.origin.url
+          
           git config user.name  "maxpain62"
           git config user.email "maxpain62@gmail.com"
+          
+          git pull origin main --rebase 
+
+          sed -i "s/^  tag: */tag: ${TAG}/g" envs/dev/values-api-gateway.yaml
+
           git add .
           git commit -m "Updated api-gateway image tag to ${{ steps.fetch-tag.outputs.tag }}"
-          git pull origin main --rebase 
           git push
