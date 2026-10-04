@@ -1,0 +1,64 @@
+name: ci for pull request - api gateway
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: build
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+      - name: checkout
+        id: checkout
+        uses: actions/checkout@v4
+
+      - name: setup java
+        uses: actions/setup-java@6
+        with:
+          distribution: temurin
+          java-version: 17
+          cache: maven
+      
+      - name: maven - compile build test
+        run: mvn verify --no-transfer-progress
+
+      - name: sonarqube - SAST + code quality
+        uses: SonarSource/sonarqube-scan-action@da4450e400cebf84292b12a85d4ca0080ae2938c
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }} 
+        with:
+          args: >
+            -Dsonar.organization=${{ vars.SONAR_ORG }}
+            -Dsonar.projectKey=${{ vars.SONAR_PROJECT_KEY_API_GATEWAY }}
+            -Dsonar.java.binaries=target/classes
+      
+      - name: Cache OWASP NVD database
+        uses: actions/cache@v4
+        with:
+          path: ~/.owasp/dependency-check-data
+          key: owasp-nvd-${{ runner.os }}-${{ hashFiles(format('{0}/pom.xml', inputs.service-dir)) }}
+          restore-keys: owasp-nvd-${{ runner.os }}-
+
+      - name: OWASP Dependency Check (CVSS ≥ 7.0 — advisory; non-blocking)
+        continue-on-error: true
+        run: |
+          cd ${{ inputs.service-dir }}
+          mvn org.owasp:dependency-check-maven:check \
+            -DfailBuildOnCVSS=7 \
+            -DenableRetired=true \
+            #    -DnvdApiKey=${{ secrets.NVD_API_KEY }} \
+            #    -DnvdApiDelay=1000 \
+            -DdataDirectory=$HOME/.owasp/dependency-check-data \
+            -Dformat=HTML \
+            --no-transfer-progress
+
+      - name: Upload Dependency Check report
+        uses: actions/upload-artifact@v6
+        with:
+          name: depcheck-${{ inputs.service-name }}
+          path: ${{ inputs.service-dir }}/target/dependency-check-report.html
+          retention-days: 3
