@@ -46,14 +46,13 @@ jobs:
       - name: OWASP Dependency Check (CVSS ≥ 7.0 — advisory; non-blocking)
         continue-on-error: true
         run: |
-          cd ${{ inputs.service-dir }}
           mvn org.owasp:dependency-check-maven:check \
             -DfailBuildOnCVSS=7 \
             -DenableRetired=true \
             #    -DnvdApiKey=${{ secrets.NVD_API_KEY }} \
             #    -DnvdApiDelay=1000 \
-            #-DdataDirectory=$HOME/.owasp/dependency-check-data \
-            -DdataDirectory=/home/runner/work/api-gateway/api-gateway/
+            -DdataDirectory=$HOME/.owasp/dependency-check-data \
+            #-DdataDirectory=/home/runner/work/api-gateway/api-gateway/
             -Dformat=HTML \
             --no-transfer-progress
 
