@@ -52,7 +52,8 @@ jobs:
             -DenableRetired=true \
             #    -DnvdApiKey=${{ secrets.NVD_API_KEY }} \
             #    -DnvdApiDelay=1000 \
-            -DdataDirectory=$HOME/.owasp/dependency-check-data \
+            #-DdataDirectory=$HOME/.owasp/dependency-check-data \
+            -DdataDirectory=/home/runner/work/api-gateway/api-gateway/
             -Dformat=HTML \
             --no-transfer-progress
 
