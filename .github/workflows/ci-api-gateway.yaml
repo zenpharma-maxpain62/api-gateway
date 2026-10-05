@@ -115,7 +115,7 @@ jobs:
 
       - name: update image tag in Chart.yaml
         run: |
-          sed -i "s/$(grep appVersion api-gateway-chart/Chart.yaml | awk '{print $2}')/v1.0.0/g" api-gateway-chart/Chart.yaml
+          sed -i "s/$(grep appVersion api-gateway-chart/Chart.yaml | awk '{print $2}')/${{ steps.fetch-tag.outputs.tag }}/g" api-gateway-chart/Chart.yaml
           git add .
           git config user.name  "maxpain62"
           git config user.email "maxpain62@gmail.com"
