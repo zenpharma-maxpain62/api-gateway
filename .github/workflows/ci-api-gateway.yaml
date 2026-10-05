@@ -99,12 +99,12 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: checkout gitops
-        uses: actions/checkout@v4
-        with:
-          repository: ${{ vars.GITOPS_REPO }}
-          token: ${{ secrets.GITOPS_TOKEN }}
-          path: _gitops
+#      - name: checkout gitops
+#        uses: actions/checkout@v4
+#        with:
+#          repository: ${{ vars.GITOPS_REPO }}
+#          token: ${{ secrets.GITOPS_TOKEN }}
+#          path: _gitops
 
       - name: fetch tag
         id: fetch-tag
@@ -113,21 +113,28 @@ jobs:
       - name: show tag
         run: echo '${{ steps.fetch-tag.outputs.tag }}'
 
-      - name: update tag in gitops
+      - name: update image tag in Chart.yaml
         run: |
-          cd _gitops
-
-          git remote -v
-          git config --get remote.origin.url
-          
-          git config user.name  "maxpain62"
-          git config user.email "maxpain62@gmail.com"
-          
-          git pull origin main --rebase 
-
-          export IMAGE_TAG=$(grep "tag:" envs/dev/values-api-gateway.yaml | awk '{print $2}')
-          sed -i "s/$IMAGE_TAG/${{ steps.fetch-tag.outputs.tag }}/g" envs/dev/values-api-gateway.yaml
-
+          sed -i "s/$(grep appVersion api-gateway-chart/Chart.yaml | awk '{print $2}')/v1.0.0/g" api-gateway-chart/Chart.yaml
           git add .
           git commit -m "Updated api-gateway image tag to ${{ steps.fetch-tag.outputs.tag }}"
           git push
+
+#      - name: update tag in gitops
+#        run: |
+#          cd _gitops
+#
+#          git remote -v
+#          git config --get remote.origin.url
+#          
+#          git config user.name  "maxpain62"
+#          git config user.email "maxpain62@gmail.com"
+#          
+#          git pull origin main --rebase 
+#
+#          export IMAGE_TAG=$(grep "tag:" envs/dev/values-api-gateway.yaml | awk '{print $2}')
+#          sed -i "s/$IMAGE_TAG/${{ steps.fetch-tag.outputs.tag }}/g" envs/dev/values-api-gateway.yaml
+#
+#          git add .
+#          git commit -m "Updated api-gateway image tag to ${{ steps.fetch-tag.outputs.tag }}"
+#          git push
