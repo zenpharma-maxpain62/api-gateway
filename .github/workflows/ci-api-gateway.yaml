@@ -128,17 +128,17 @@ jobs:
           git pull
 
           export IMAGE_TAG=${{ steps.fetch-tag.outputs.tag }}
-          export CURRENT_IMAGE_TAG=$(grep "tag:" envs/dev/values-api-service.yaml | awk '{print $2}')
+          export CURRENT_IMAGE_TAG=$(grep "tag:" envs/dev/values-api-gateway.yaml | awk '{print $2}')
 
           echo "Current image tag: $CURRENT_IMAGE_TAG"
           echo "New image tag: $IMAGE_TAG"
           
-          sed -i "s/$CURRENT_IMAGE_TAG/$IMAGE_TAG/g" envs/dev/values-api-service.yaml
+          sed -i "s/$CURRENT_IMAGE_TAG/$IMAGE_TAG/g" envs/dev/values-api-gateway.yaml
 
           git config user.name  "maxpain62"
           git config user.email "maxpain62@gmail.com"
 
-          git add envs/dev/values-api-service.yaml
-          git commit -m "Update api-service image tag to $IMAGE_TAG"
+          git add envs/dev/values-api-gateway.yaml
+          git commit -m "Update api-gateway image tag to $IMAGE_TAG"
 
           git push 
