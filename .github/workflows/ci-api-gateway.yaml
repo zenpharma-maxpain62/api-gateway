@@ -99,19 +99,19 @@ jobs:
         with:
           fetch-depth: 0
 
-#      - name: checkout gitops
-#        uses: actions/checkout@v4
-#        with:
-#          repository: ${{ vars.GITOPS_REPO }}
-##          token: ${{ secrets.GITOPS_TOKEN }}
-##          path: _gitops
-#
-#      - name: fetch tag
-#        id: fetch-tag
-#        run: echo "tag=$(git describe --tags --abbrev=0)" >> "$GITHUB_OUTPUT"
-#
-#      - name: show tag
-#        run: echo '${{ steps.fetch-tag.outputs.tag }}'
+      - name: checkout gitops
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ vars.GITOPS_REPO }}
+          token: ${{ secrets.GITOPS_TOKEN }}
+          path: _gitops
+
+      - name: fetch tag
+        id: fetch-tag
+        run: echo "tag=$(git describe --tags --abbrev=0)" >> "$GITHUB_OUTPUT"
+
+      - name: show tag
+        run: echo '${{ steps.fetch-tag.outputs.tag }}'
 #
 #      - name: update image tag in Chart.yaml
 #        run: |
