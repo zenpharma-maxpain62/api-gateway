@@ -125,18 +125,20 @@ jobs:
       - name: update tag in gitops
         run: |
           cd _gitops
+          git pull
 
-          git remote -v
-          git config --get remote.origin.url
+          export IMAGE_TAG=${{ steps.fetch-tag.outputs.tag }}
+          export CURRENT_IMAGE_TAG=$(grep "tag:" envs/dev/values-api-service.yaml | awk '{print $2}')
+
+          echo "Current image tag: $CURRENT_IMAGE_TAG"
+          echo "New image tag: $IMAGE_TAG"
           
+          sed -i "s/$CURRENT_IMAGE_TAG/$IMAGE_TAG/g" envs/dev/values-api-service.yaml
+
           git config user.name  "maxpain62"
           git config user.email "maxpain62@gmail.com"
-          
-          git pull origin main --rebase 
 
-          export IMAGE_TAG=$(grep "tag:" envs/dev/values-api-gateway.yaml | awk '{print $2}')
-          git 
+          git add envs/dev/values-api-service.yaml
+          git commit -m "Update api-service image tag to $IMAGE_TAG"
 
-          git add .
-          git commit -m "Updated api-gateway image tag to ${{ steps.fetch-tag.outputs.tag }}"
-          git push
+          git push 
